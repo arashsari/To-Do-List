@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+<meta charset="UTF-8">
+<script src="ToDoCtrl.js"></script>
+<title>todo</title>
+<style>
+	.done{text-decoration: line-through;color: #ccc;}
+</style>
+</head>
+<body ng-app="ToDo">
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.15/angular.min.js"></script>
+	<div ng-controller="todoController">
+		<form name="frm" ng-submit="addTodo()">
+			<input type="text" name="newtodo" ng-model="newTodo"  placeholder="What needs to be done?" ng-keyup="addTodo()" required />
+		</form>
+		<button ng-click="clearCompleted()">Clear Completed</button>
+		<section id ="main" style="display: block;">
+<!-- 			<div ng-show="isTodo()">
+				 <input id="toggle-all" type="checkbox" ng-model="markAll"  ng-click="toggleMarkAll()"/>
+                 <label for="toggle-all">Mark all as complete</label>
+                 </div> -->
+<!-- 	   <ul id="todo-list" class="unstyled">
+          <li ng-repeat="todo in todos" ng-dblclick="toggleEditMode()">
+            <div class="view" ng-keyup="editTodo()">
+              <input type="checkbox" ng-model="todo.done"/>
+              <span class="done-{{todo.done}}" >{{todo.text}}</span>        
+            </div>
+            <input class="edit" type="text" ng-model="todo.text"
+              ng-keyup="editOnEnter(todo)"/>
+          </li>
+        </ul> -->
+		</section>		
+		<ul>
+			<li ng-repeat="name in names">
+				<input type="checkbox" ng-model="name.completion" ng-change="change($index)"/>
+			     <span ng-class="{'done':todo.done}">{{name.description}} </span> 
+			</li>		
+			<li ng-repeat="todo in todos" >
+				<input type="checkbox" ng-model="todo.done" />
+			     <span ng-class="{'done':todo.done}">{{todo.title}}</span> 
+			</li>
+		</ul> 
+	</div>
+	
+	
+	
+	
+	<script>
+var app = angular.module('ToDo',[]);
+app.controller('todoController', function($scope, $http) {
+    $http.get("http://localhost:8080/Demo/items.json")
+    .success(function (response) {$scope.names = response; });
+    $scope.todos = [];
+    $scope.todo = [];
+    $scope.myindex=-1;
+
+    $scope.isTodo = function(){
+        return $scope.todos.length > 0;  
+    }
+    
+    $scope.toggleEditMode = function(){
+        $(event.target).closest('li').toggleClass('editing');
+    };
+    
+    $scope.editOnEnter = function(todo){
+        if(event.keyCode == 13 && todo.text){
+            $scope.toggleEditMode();
+        }
+    };
+
+   	$scope.addTodo =function(){
+   		 if(event.keyCode == 13 && $scope.newTodo){
+   	     	$scope.todos.push({'title':$scope.newTodo,'done':false})	
+   	     	
+     	$http.post("http://localhost:8080/Demo/items",{'completion':false,'description':$scope.newTodo} )
+    .success(function(){
+    	 
+       });  
+  	
+     $scope.newTodo ="";
+    	 }
+       }   
+    $scope.clearCompleted=function(){
+    	
+    $scope.names = $scope.names.filter(function(item){
+
+    $http.delete("http://localhost:8080/Demo/items/"+$scope.names[$scope.myindex].id)
+     .success(); 
+    
+    $http.get("http://localhost:8080/Demo/items.json")
+    .success(function (response) {$scope.names = response;
+     });
+ 	     
+     return !item.done
+    
+    })
+    	}
+   	$scope.change=function(index){
+   	    $scope.myindex=index;
+     }
+});       
+</script> 
+
+</body>
+</html>
